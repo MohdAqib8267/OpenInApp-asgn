@@ -1,0 +1,49 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  phone_number String
+  priority     Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime  @default("2024-02-02T17:30:46.437Z")
+  tasks        Task[]
+}
+
+model Task {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  due_date    DateTime
+  status      TaskStatus
+  priority    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt    DateTime  @default("2024-02-02T17:30:46.437Z")
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  subtasks    Subtasks[]
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model Subtasks {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  status    Boolean
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt    DateTime  @default("2024-02-02T17:30:46.437Z")
+  taskId    String
+  task      Task      @relation(fields: [taskId], references: [id])
+}
